@@ -1,0 +1,146 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Bill {{ bill.bill_number }}</h1>
+            <p class="text-gray-500 dark:text-gray-400">Purchase Bill Details</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ url_for('purchases.list_bills') }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                Back to Bills
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Bill Info -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Bill Information</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Vendor</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ bill.vendor_name or 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Bill Date</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ bill.bill_date }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Due Date</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ bill.due_date or '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                        {% set status_colors = {'draft': 'gray', 'pending': 'yellow', 'partial': 'blue', 'paid': 'green'} %}
+                        {% set color = status_colors.get(bill.status, 'gray') %}
+                        <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-{{ color }}-100 text-{{ color }}-800 dark:bg-{{ color }}-900 dark:text-{{ color }}-300">
+                            {{ bill.status|title }}
+                        </span>
+                    </div>
+                </div>
+                {% if bill.notes %}
+                <div class="mt-4 pt-4 border-t dark:border-gray-700">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Notes</p>
+                    <p class="text-gray-900 dark:text-white">{{ bill.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Items Table -->
+            <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Items</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th class="px-4 py-3">Product</th>
+                                <th class="px-4 py-3">Quantity</th>
+                                <th class="px-4 py-3">Price</th>
+                                <th class="px-4 py-3">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in bill.items %}
+                            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <td class="px-4 py-3">{{ item.product_name or 'N/A' }}</td>
+                                <td class="px-4 py-3">{{ item.quantity }}</td>
+                                <td class="px-4 py-3">{{ "%.2f"|format(item.price) }}</td>
+                                <td class="px-4 py-3">{{ "%.2f"|format(item.quantity * item.price) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totals -->
+                <div class="flex justify-end mt-4">
+                    <div class="w-64 space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">Sub Total:</span>
+                            <span class="text-gray-900 dark:text-white">{{ "%.2f"|format(bill.sub_total) }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">VAT:</span>
+                            <span class="text-gray-900 dark:text-white">{{ "%.2f"|format(bill.vat_amount) }}</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold border-t pt-2">
+                            <span class="text-gray-900 dark:text-white">Total:</span>
+                            <span class="text-gray-900 dark:text-white">{{ "%.2f"|format(bill.total_amount) }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-green-600">
+                            <span>Paid:</span>
+                            <span>{{ "%.2f"|format(bill.paid_amount) }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm font-medium text-red-600">
+                            <span>Balance Due:</span>
+                            <span>{{ "%.2f"|format(bill.total_amount - bill.paid_amount) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Panel -->
+        <div>
+            <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Record Payment</h3>
+                <form method="POST" action="{{ url_for('purchases.record_payment', bill_id=bill.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Amount</label>
+                            <input type="number" name="amount" id="amount" step="0.01" min="0" max="{{ bill.total_amount - bill.paid_amount }}" required
+                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        </div>
+                        <div>
+                            <label for="payment_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Payment Date</label>
+                            <input type="date" name="payment_date" id="payment_date" required
+                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        </div>
+                        <div>
+                            <label for="payment_account_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Payment Account</label>
+                            <select name="payment_account_id" id="payment_account_id" required
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="">Select Account</option>
+                                <option value="1">Cash</option>
+                                <option value="2">Bank Account</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="reference" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Reference</label>
+                            <input type="text" name="reference" id="reference"
+                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        </div>
+                        <button type="submit" class="w-full text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                            Record Payment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

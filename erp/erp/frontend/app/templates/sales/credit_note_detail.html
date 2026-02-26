@@ -1,0 +1,182 @@
+{% extends "dashboard_layout.html" %}
+
+{% block page_title %}Credit Note {{ credit_note.get('credit_note_number', '') }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-3">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Credit Note {{ credit_note.get('credit_note_number', '') }}</h2>
+                {% set status = credit_note.get('status', 'open') %}
+                {% if status == 'open' %}
+                <span class="px-3 py-1 text-sm font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Open</span>
+                {% elif status == 'applied' %}
+                <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">Applied</span>
+                {% else %}
+                <span class="px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Closed</span>
+                {% endif %}
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Created {{ credit_note.get('credit_note_date', '-') }}</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <a href="{{ url_for('sales.list_credit_notes') }}" class="inline-flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                </svg>
+                Back to Credit Notes
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Credit Note Details -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Customer Info -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Customer Information</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Customer</p>
+                        <p class="text-gray-900 dark:text-white font-medium">{{ credit_note.get('customer_name', '-') }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                        <p class="text-gray-900 dark:text-white">{{ credit_note.get('customer_email', '-') }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Original Invoice</p>
+                        {% if credit_note.get('invoice_id') %}
+                        <a href="{{ url_for('sales.view_invoice', invoice_id=credit_note.get('invoice_id')) }}" class="text-primary-600 hover:text-primary-900 dark:text-primary-400">
+                            {{ credit_note.get('invoice_number', '-') }}
+                        </a>
+                        {% else %}
+                        <p class="text-gray-900 dark:text-white">-</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Reason</p>
+                        <p class="text-gray-900 dark:text-white">{{ credit_note.get('reason', '-') }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Items -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Items</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Product</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Qty</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Price</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                            {% for item in (credit_note.get('items') or []) %}
+                            {% if item is mapping %}
+                            <tr>
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                                    {{ item.get('product_name', 'N/A') }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-white text-right">
+                                    {{ item.get('quantity', 0) }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-white text-right">
+                                    {{ item.get('price', 0) | currency }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-white text-right">
+                                    {{ item.get('total', 0) | currency }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">No items</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Totals -->
+                <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <div class="flex justify-end">
+                        <div class="w-64 space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
+                                <span class="text-gray-900 dark:text-white">{{ credit_note.get('subtotal', 0) | currency }}</span>
+                            </div>
+                            {% if credit_note.get('vat_amount') %}
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500 dark:text-gray-400">VAT</span>
+                                <span class="text-gray-900 dark:text-white">{{ credit_note.get('vat_amount', 0) | currency }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="flex justify-between text-lg font-semibold pt-2 border-t border-gray-100 dark:border-gray-700">
+                                <span class="text-gray-900 dark:text-white">Total</span>
+                                <span class="text-gray-900 dark:text-white">{{ credit_note.get('total_amount', 0) | currency }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notes -->
+            {% if credit_note.get('notes') %}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Notes</h3>
+                <p class="text-gray-600 dark:text-gray-400">{{ credit_note.get('notes') }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Amount Summary -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Amount Summary</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400">Total Credit</span>
+                        <span class="text-xl font-bold text-gray-900 dark:text-white">{{ credit_note.get('total_amount', 0) | currency }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400">Applied</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ credit_note.get('applied_amount', 0) | currency }}</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700">
+                        <span class="text-gray-500 dark:text-gray-400">Remaining</span>
+                        <span class="font-bold text-green-600 dark:text-green-400">{{ credit_note.get('remaining_amount', credit_note.get('total_amount', 0)) | currency }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            {% if credit_note.get('status') == 'open' %}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Actions</h3>
+                <div class="space-y-3">
+                    <button class="w-full flex items-center justify-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"/>
+                        </svg>
+                        Apply to Invoice
+                    </button>
+                    <button class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Print Credit Note
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

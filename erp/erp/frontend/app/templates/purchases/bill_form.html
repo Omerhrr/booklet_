@@ -1,0 +1,188 @@
+{% extends "dashboard_layout.html" %}
+
+{% block extra_head %}
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('billForm', () => ({
+        items: [],
+        vendors: {{ vendors | tojson }},
+        products: {{ products | tojson }},
+
+        addItem() {
+            this.items.push({
+                product_id: '',
+                quantity: 1,
+                price: 0
+            });
+        },
+
+        removeItem(index) {
+            this.items.splice(index, 1);
+        },
+
+        updatePrice(index) {
+            const productId = this.items[index].product_id;
+            const product = this.products.find(p => p.id == productId);
+            if (product) {
+                this.items[index].price = product.purchase_price;
+            }
+        },
+
+        get subTotal() {
+            return this.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+        },
+
+        get vatAmount() {
+            return this.subTotal * 0.075; // 7.5% VAT
+        },
+
+        get totalAmount() {
+            return this.subTotal + this.vatAmount;
+        },
+
+        submitForm() {
+            const form = document.getElementById('billForm');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'items_json';
+            input.value = JSON.stringify(this.items);
+            form.appendChild(input);
+            form.submit();
+        }
+    }));
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="p-6" x-data="billForm()">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ title }}</h1>
+        <p class="text-gray-500 dark:text-gray-400">Create a new purchase bill</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800">
+        <form id="billForm" method="POST" action="{{ url_for('purchases.new_bill') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="p-6 space-y-6">
+                <!-- Header Info -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                        <label for="vendor_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Vendor *</label>
+                        <select name="vendor_id" id="vendor_id" required
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="">Select Vendor</option>
+                            {% for vendor in vendors %}
+                            <option value="{{ vendor.id }}">{{ vendor.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="bill_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Bill Date *</label>
+                        <input type="date" name="bill_date" id="bill_date" required
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="due_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Due Date</label>
+                        <input type="date" name="due_date" id="due_date"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="bill_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Vendor Bill Number</label>
+                        <input type="text" name="bill_number" id="bill_number"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Items</h3>
+                        <button type="button" @click="addItem()" class="text-primary-600 hover:text-primary-700 dark:text-primary-500">
+                            + Add Item
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th class="px-4 py-3">Product</th>
+                                    <th class="px-4 py-3">Quantity</th>
+                                    <th class="px-4 py-3">Price</th>
+                                    <th class="px-4 py-3">Total</th>
+                                    <th class="px-4 py-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="(item, index) in items" :key="index">
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                        <td class="px-4 py-3">
+                                            <select x-model="item.product_id" @change="updatePrice(index)"
+                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-full">
+                                                <option value="">Select Product</option>
+                                                <template x-for="product in products" :key="product.id">
+                                                    <option :value="product.id" x-text="product.name"></option>
+                                                </template>
+                                            </select>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <input type="number" x-model.number="item.quantity" min="1" step="1"
+                                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-24">
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <input type="number" x-model.number="item.price" min="0" step="0.01"
+                                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-32">
+                                        </td>
+                                        <td class="px-4 py-3" x-text="(item.quantity * item.price).toFixed(2)"></td>
+                                        <td class="px-4 py-3">
+                                            <button type="button" @click="removeItem(index)" class="text-red-600 hover:text-red-700">
+                                                Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Totals -->
+                <div class="flex justify-end">
+                    <div class="w-64 space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">Sub Total:</span>
+                            <span class="text-gray-900 dark:text-white" x-text="subTotal.toFixed(2)"></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">VAT (7.5%):</span>
+                            <span class="text-gray-900 dark:text-white" x-text="vatAmount.toFixed(2)"></span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold border-t pt-2">
+                            <span class="text-gray-900 dark:text-white">Total:</span>
+                            <span class="text-gray-900 dark:text-white" x-text="totalAmount.toFixed(2)"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label for="notes" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Notes</label>
+                    <textarea name="notes" id="notes" rows="3"
+                              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end gap-4">
+                    <a href="{{ url_for('purchases.list_bills') }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                        Cancel
+                    </a>
+                    <button type="button" @click="submitForm()" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                        Save Bill
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

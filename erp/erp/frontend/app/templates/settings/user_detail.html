@@ -1,0 +1,128 @@
+{% extends "dashboard_layout.html" %}
+
+{% block page_title %}{{ user.username }} - User Details{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <a href="{{ url_for('settings.index') }}" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ user.username }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <a href="{{ url_for('settings.edit_user', user_id=user.id) }}" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition text-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Edit User
+            </a>
+        </div>
+    </div>
+    
+    <!-- User Info Cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Basic Info -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Basic Information</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Username</label>
+                    <p class="text-gray-900 dark:text-white font-medium">{{ user.username }}</p>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Email</label>
+                    <p class="text-gray-900 dark:text-white font-medium">{{ user.email }}</p>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Status</label>
+                    <div class="mt-1">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full {{ 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' if user.is_active else 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
+                            {{ 'Active' if user.is_active else 'Inactive' }}
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Account Type</label>
+                    <div class="mt-1">
+                        {% if user.is_superuser %}
+                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">Superuser</span>
+                        {% else %}
+                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">Regular User</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Roles -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Assigned Roles</h3>
+            {% if user.roles %}
+            <div class="space-y-3">
+                {% for role in user.roles %}
+                <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ role.role_name }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ role.branch_name or 'No branch' }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+                <p>No roles assigned</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Permissions -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Permissions
+                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">({{ user.permissions|length }} total)</span>
+            </h3>
+            {% if user.is_superuser %}
+            <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <span class="text-purple-800 dark:text-purple-300 font-medium">Full Access (Superuser)</span>
+                </div>
+                <p class="text-sm text-purple-600 dark:text-purple-400 mt-2">This user has unrestricted access to all features.</p>
+            </div>
+            {% elif user.permissions %}
+            <div class="max-h-64 overflow-y-auto">
+                <div class="flex flex-wrap gap-2">
+                    {% for permission in user.permissions|sort %}
+                    <span class="px-2 py-1 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                        {{ permission }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <p>No permissions</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "dashboard_layout.html" %}
+
+{% block page_title %}{{ vendor.name }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ vendor.name }}</h2>
+            <p class="text-gray-500 dark:text-gray-400">{{ vendor.email or 'No email' }}</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <a href="{{ url_for('crm.edit_vendor', vendor_id=vendor.id) }}" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                </svg>
+                Edit
+            </a>
+            <a href="{{ url_for('crm.list_vendors') }}" class="inline-flex items-center px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                </svg>
+                Back to Vendors
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Vendor Info -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Contact Information</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                        <p class="text-gray-900 dark:text-white">{{ vendor.email or '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+                        <p class="text-gray-900 dark:text-white">{{ vendor.phone or '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Tax ID</p>
+                        <p class="text-gray-900 dark:text-white">{{ vendor.tax_id or '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Payment Terms</p>
+                        <p class="text-gray-900 dark:text-white">{{ vendor.payment_terms or 30 }} days</p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Address</p>
+                        <p class="text-gray-900 dark:text-white">{{ vendor.address or '-' }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Purchase History -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Purchase History</h3>
+                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <p>No purchase history available</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Balance Summary -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Balance Summary</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400">Total Payable</span>
+                        <span class="text-xl font-bold text-red-600 dark:text-red-400">{{ balance.total_balance | currency if balance else '$0.00' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400">Overdue</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ balance.overdue | currency if balance else '$0.00' }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+                <div class="space-y-3">
+                    <a href="{{ url_for('purchases.new_bill') }}" class="flex items-center px-4 py-2 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-xl hover:bg-primary-100 dark:hover:bg-primary-900/30 transition">
+                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                        </svg>
+                        Create Bill
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

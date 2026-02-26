@@ -1,0 +1,73 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ title }}</h1>
+        <p class="text-gray-500 dark:text-gray-400">
+            {% if role %}Edit role and permissions{% else %}Create a new role{% endif %}
+        </p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="p-6 space-y-6">
+                <div>
+                    <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Role Name *</label>
+                    <input type="text" name="name" id="name" required
+                           value="{{ role.name if role else '' }}"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+
+                <div>
+                    <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                    <textarea name="description" id="description" rows="2"
+                              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{{ role.description if role else '' }}</textarea>
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Permissions</label>
+                    
+                    {% set permissions_by_category = {} %}
+                    {% for perm in permissions %}
+                        {% if perm.category not in permissions_by_category %}
+                            {% set _ = permissions_by_category.update({perm.category: []}) %}
+                        {% endif %}
+                        {% set _ = permissions_by_category[perm.category].append(perm) %}
+                    {% endfor %}
+                    
+                    <div class="space-y-4 max-h-96 overflow-y-auto border rounded-lg p-4 dark:border-gray-700">
+                        {% for category, perms in permissions_by_category.items() %}
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ category }}</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                {% for perm in perms %}
+                                <label class="flex items-center p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <input type="checkbox" name="permissions" value="{{ perm.id }}"
+                                           {% if role and perm.id in role.permission_ids %}checked{% endif %}
+                                           class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ perm.name }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">No permissions available</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-4">
+                    <a href="{{ url_for('settings.index') }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                        Cancel
+                    </a>
+                    <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                        {% if role %}Update Role{% else %}Create Role{% endif %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "dashboard_layout.html" %}
+
+{% block page_title %}Credit Notes{% endblock %}
+
+{% block content %}
+<div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+    <!-- Header -->
+    <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Credit Notes</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage sales returns and credit notes</p>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="mt-4 flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                </svg>
+                <input type="text" placeholder="Search credit notes..." class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+            </div>
+            <select class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+                <option value="">All Status</option>
+                <option value="open">Open</option>
+                <option value="applied">Applied</option>
+                <option value="closed">Closed</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Table -->
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Credit Note #</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                {% for cn in credit_notes %}
+                {% if cn is mapping %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="{{ url_for('sales.view_credit_note', credit_note_id=cn.get('id')) }}" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 font-medium">
+                            {{ cn.get('credit_note_number', 'N/A') }}
+                        </a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ cn.get('customer_name', 'N/A') }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        {{ cn.get('credit_note_date', '-') }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ cn.get('total_amount', 0) | currency }}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% set status = cn.get('status', 'open') %}
+                        {% if status == 'open' %}
+                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Open</span>
+                        {% elif status == 'applied' %}
+                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">Applied</span>
+                        {% else %}
+                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Closed</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{{ url_for('sales.view_credit_note', credit_note_id=cn.get('id')) }}" class="text-primary-600 hover:text-primary-900 dark:text-primary-400">View</a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                        </svg>
+                        <p>No credit notes found</p>
+                        <p class="text-sm mt-1">Credit notes are created when processing returns from invoices</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

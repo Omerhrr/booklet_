@@ -1,0 +1,54 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Bank Reconciliation</h1>
+        <p class="text-gray-500 dark:text-gray-400">Match your bank statement with your records</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div>
+                    <label for="account_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Account</label>
+                    <select name="account_id" id="account_id"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">Select Account</option>
+                        {% for acc in accounts %}
+                        <option value="{{ acc.id }}">{{ acc.account_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="statement_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Statement Date</label>
+                    <input type="date" name="statement_date" id="statement_date"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                <div>
+                    <label for="statement_balance" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Statement Balance</label>
+                    <input type="number" name="statement_balance" id="statement_balance" step="0.01"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+            </div>
+
+            <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                Start Reconciliation
+            </button>
+        </form>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6">
+        <h3 class="text-lg font-medium text-blue-800 dark:text-blue-300 mb-4">How to Reconcile</h3>
+        <ol class="list-decimal list-inside space-y-2 text-blue-700 dark:text-blue-400">
+            <li>Select the bank account you want to reconcile</li>
+            <li>Enter the statement date from your bank statement</li>
+            <li>Enter the ending balance from your bank statement</li>
+            <li>Compare your transactions and mark them as cleared</li>
+            <li>Resolve any differences between your records and the bank statement</li>
+        </ol>
+    </div>
+</div>
+{% endblock %}

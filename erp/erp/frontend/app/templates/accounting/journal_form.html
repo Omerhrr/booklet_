@@ -1,0 +1,171 @@
+{% extends "dashboard_layout.html" %}
+
+{% block extra_head %}
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('journalForm', () => ({
+        lines: [],
+        accounts: {{ accounts | tojson }},
+
+        addLine() {
+            this.lines.push({
+                account_id: '',
+                debit: 0,
+                credit: 0,
+                description: ''
+            });
+        },
+
+        removeLine(index) {
+            this.lines.splice(index, 1);
+        },
+
+        get totalDebit() {
+            return this.lines.reduce((sum, line) => sum + parseFloat(line.debit || 0), 0);
+        },
+
+        get totalCredit() {
+            return this.lines.reduce((sum, line) => sum + parseFloat(line.credit || 0), 0);
+        },
+
+        get isBalanced() {
+            return Math.abs(this.totalDebit - this.totalCredit) < 0.01;
+        },
+
+        submitForm() {
+            if (!this.isBalanced) {
+                alert('Debits and credits must be equal');
+                return;
+            }
+            const form = document.getElementById('journalForm');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'lines_json';
+            input.value = JSON.stringify(this.lines);
+            form.appendChild(input);
+            form.submit();
+        }
+    }));
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="p-6" x-data="journalForm()">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ title }}</h1>
+        <p class="text-gray-500 dark:text-gray-400">Create a new journal entry</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800">
+        <form id="journalForm" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="p-6 space-y-6">
+                <!-- Header Info -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="transaction_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Transaction Date *</label>
+                        <input type="date" name="transaction_date" id="transaction_date" required
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="reference" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Reference</label>
+                        <input type="text" name="reference" id="reference"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                        <input type="text" name="description" id="description"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                </div>
+
+                <!-- Lines Table -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Journal Lines</h3>
+                        <button type="button" @click="addLine()" class="text-primary-600 hover:text-primary-700 dark:text-primary-500">
+                            + Add Line
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th class="px-4 py-3">Account</th>
+                                    <th class="px-4 py-3">Description</th>
+                                    <th class="px-4 py-3">Debit</th>
+                                    <th class="px-4 py-3">Credit</th>
+                                    <th class="px-4 py-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="(line, index) in lines" :key="index">
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                        <td class="px-4 py-3">
+                                            <select x-model="line.account_id"
+                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-full">
+                                                <option value="">Select Account</option>
+                                                <template x-for="account in accounts" :key="account.id">
+                                                    <option :value="account.id" x-text="account.code + ' - ' + account.name"></option>
+                                                </template>
+                                            </select>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <input type="text" x-model="line.description"
+                                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-full">
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <input type="number" x-model.number="line.debit" min="0" step="0.01"
+                                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-28">
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <input type="number" x-model.number="line.credit" min="0" step="0.01"
+                                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white w-28">
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <button type="button" @click="removeLine(index)" class="text-red-600 hover:text-red-700">
+                                                Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Totals -->
+                <div class="flex justify-end">
+                    <div class="w-72 space-y-2 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">Total Debit:</span>
+                            <span class="font-medium text-gray-900 dark:text-white" x-text="totalDebit.toFixed(2)"></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">Total Credit:</span>
+                            <span class="font-medium text-gray-900 dark:text-white" x-text="totalCredit.toFixed(2)"></span>
+                        </div>
+                        <div class="flex justify-between font-bold border-t pt-2" :class="isBalanced ? 'text-green-600' : 'text-red-600'">
+                            <span>Difference:</span>
+                            <span x-text="(totalDebit - totalCredit).toFixed(2)"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end gap-4">
+                    <a href="{{ url_for('accounting.journal') }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                        Cancel
+                    </a>
+                    <button type="button" @click="submitForm()" :disabled="!isBalanced"
+                            class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Save Journal Entry
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

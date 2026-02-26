@@ -1,0 +1,92 @@
+{% extends "dashboard_layout.html" %}
+
+{% block page_title %}{{ 'New Vendor' if not vendor else 'Edit Vendor' }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                {{ 'New Vendor' if not vendor else 'Edit Vendor' }}
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {{ 'Add a new supplier or vendor' if not vendor else 'Update vendor information' }}
+            </p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('crm.new_vendor' if not vendor else 'crm.edit_vendor', vendor_id=vendor.id if vendor else None) }}" class="p-6 space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Vendor Name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="name" id="name" required
+                        value="{{ vendor.name if vendor else '' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="Enter vendor name">
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Email Address
+                    </label>
+                    <input type="email" name="email" id="email"
+                        value="{{ vendor.email if vendor else '' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="vendor@example.com">
+                </div>
+                
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Phone Number
+                    </label>
+                    <input type="tel" name="phone" id="phone"
+                        value="{{ vendor.phone if vendor else '' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="+1 234 567 890">
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Address
+                    </label>
+                    <textarea name="address" id="address" rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="Enter full address">{{ vendor.address if vendor else '' }}</textarea>
+                </div>
+                
+                <div>
+                    <label for="tax_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Tax ID / VAT Number
+                    </label>
+                    <input type="text" name="tax_id" id="tax_id"
+                        value="{{ vendor.tax_id if vendor else '' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="Enter tax ID">
+                </div>
+                
+                <div>
+                    <label for="payment_terms" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Payment Terms (Days)
+                    </label>
+                    <input type="number" name="payment_terms" id="payment_terms"
+                        value="{{ vendor.payment_terms if vendor else '30' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="30">
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <a href="{{ url_for('crm.list_vendors') }}" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">
+                    Cancel
+                </a>
+                <button type="submit" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition">
+                    {{ 'Create Vendor' if not vendor else 'Save Changes' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

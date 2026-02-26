@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div class="text-center">
+        <div class="w-24 h-24 mx-auto mb-6 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+            <svg class="w-12 h-12 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m2-10V4a2 2 0 00-2-2H8a2 2 0 00-2 2v1M5 9h14l1 12H4L5 9z"/>
+            </svg>
+        </div>
+        <h1 class="text-6xl font-bold text-gray-900 dark:text-white mb-4">403</h1>
+        <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Access Denied</h2>
+        <p class="text-gray-500 dark:text-gray-400 mb-6">You don't have permission to access this page.</p>
+        <a href="{{ url_for('dashboard.index') }}" class="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Go to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
