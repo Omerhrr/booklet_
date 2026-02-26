@@ -1,0 +1,103 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Fund Transfers</h1>
+            <p class="text-gray-500 dark:text-gray-400">Transfer funds between accounts</p>
+        </div>
+    </div>
+
+    <!-- Transfer Form -->
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6 mb-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">New Transfer</h3>
+        <form method="POST" action="{{ url_for('banking.new_transfer') }}">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label for="from_account_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">From Account *</label>
+                    <select name="from_account_id" id="from_account_id" required
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">Select Account</option>
+                        {% for acc in accounts %}
+                        <option value="{{ acc.id }}">{{ acc.account_name }} ({{ "%.2f"|format(acc.current_balance or 0) }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="to_account_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">To Account *</label>
+                    <select name="to_account_id" id="to_account_id" required
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">Select Account</option>
+                        {% for acc in accounts %}
+                        <option value="{{ acc.id }}">{{ acc.account_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Amount *</label>
+                    <input type="number" name="amount" id="amount" step="0.01" min="0" required
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                <div>
+                    <label for="transfer_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Transfer Date *</label>
+                    <input type="date" name="transfer_date" id="transfer_date" required
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                <div>
+                    <label for="reference" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Reference</label>
+                    <input type="text" name="reference" id="reference"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                        Transfer
+                    </button>
+                </div>
+            </div>
+            <div class="mt-4">
+                <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                <input type="text" name="description" id="description"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+        </form>
+    </div>
+
+    <!-- Transfers History -->
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800">
+        <div class="p-6 border-b dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Transfer History</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th class="px-6 py-3">Date</th>
+                        <th class="px-6 py-3">From</th>
+                        <th class="px-6 py-3">To</th>
+                        <th class="px-6 py-3">Amount</th>
+                        <th class="px-6 py-3">Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transfer in transfers %}
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                        <td class="px-6 py-4">{{ transfer.transfer_date }}</td>
+                        <td class="px-6 py-4">{{ transfer.from_account_name or 'N/A' }}</td>
+                        <td class="px-6 py-4">{{ transfer.to_account_name or 'N/A' }}</td>
+                        <td class="px-6 py-4 font-medium">{{ "%.2f"|format(transfer.amount) }}</td>
+                        <td class="px-6 py-4">{{ transfer.reference or '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            No transfers recorded yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

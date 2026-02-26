@@ -1,0 +1,90 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Reports</h1>
+        <p class="text-gray-500 dark:text-gray-400">Generate and view business reports</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Sales Report -->
+        <a href="{{ url_for('reports.sales_report') }}" class="block bg-white rounded-lg shadow dark:bg-gray-800 p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            <div class="flex items-center mb-4">
+                <div class="p-2 bg-green-100 rounded-lg dark:bg-green-900">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h3 class="ml-3 text-lg font-medium text-gray-900 dark:text-white">Sales Report</h3>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">View sales trends, top customers, and revenue analysis</p>
+        </a>
+
+        <!-- Purchases Report -->
+        <a href="{{ url_for('reports.purchases_report') }}" class="block bg-white rounded-lg shadow dark:bg-gray-800 p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            <div class="flex items-center mb-4">
+                <div class="p-2 bg-blue-100 rounded-lg dark:bg-blue-900">
+                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="ml-3 text-lg font-medium text-gray-900 dark:text-white">Purchases Report</h3>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Analyze purchase bills, vendor performance, and costs</p>
+        </a>
+
+        <!-- Expenses Report -->
+        <a href="{{ url_for('reports.expenses_report') }}" class="block bg-white rounded-lg shadow dark:bg-gray-800 p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            <div class="flex items-center mb-4">
+                <div class="p-2 bg-red-100 rounded-lg dark:bg-red-900">
+                    <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="ml-3 text-lg font-medium text-gray-900 dark:text-white">Expenses Report</h3>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Track expenses by category and monitor spending</p>
+        </a>
+
+        <!-- Inventory Report -->
+        <a href="{{ url_for('reports.inventory_report') }}" class="block bg-white rounded-lg shadow dark:bg-gray-800 p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            <div class="flex items-center mb-4">
+                <div class="p-2 bg-yellow-100 rounded-lg dark:bg-yellow-900">
+                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                </div>
+                <h3 class="ml-3 text-lg font-medium text-gray-900 dark:text-white">Inventory Report</h3>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Stock levels, valuation, and movement analysis</p>
+        </a>
+
+        <!-- Aging Report -->
+        <a href="{{ url_for('reports.aging_report') }}" class="block bg-white rounded-lg shadow dark:bg-gray-800 p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            <div class="flex items-center mb-4">
+                <div class="p-2 bg-purple-100 rounded-lg dark:bg-purple-900">
+                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="ml-3 text-lg font-medium text-gray-900 dark:text-white">Aging Report</h3>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Receivables and payables aging analysis</p>
+        </a>
+
+        <!-- VAT Report -->
+        <a href="{{ url_for('reports.vat_report') }}" class="block bg-white rounded-lg shadow dark:bg-gray-800 p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            <div class="flex items-center mb-4">
+                <div class="p-2 bg-indigo-100 rounded-lg dark:bg-indigo-900">
+                    <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="ml-3 text-lg font-medium text-gray-900 dark:text-white">VAT Report</h3>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">VAT collected and paid summary</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

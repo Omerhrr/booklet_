@@ -1,0 +1,80 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ account.account_name }}</h1>
+            <p class="text-gray-500 dark:text-gray-400">{{ account.bank_name or 'Bank Account' }}</p>
+        </div>
+        <a href="{{ url_for('banking.list_accounts') }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+            Back
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Account Info -->
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Account Details</h3>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Account Name</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ account.account_name }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Bank Name</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ account.bank_name or '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Account Number</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ account.account_number or '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Currency</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ account.currency }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balance -->
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Balance</h3>
+            <div class="text-center">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Current Balance</p>
+                <p class="text-4xl font-bold text-gray-900 dark:text-white mt-2">{{ "%.2f"|format(account.current_balance or 0) }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">{{ account.currency }}</p>
+            </div>
+            <div class="mt-4 pt-4 border-t dark:border-gray-700">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500 dark:text-gray-400">Opening Balance</span>
+                    <span class="text-gray-900 dark:text-white">{{ "%.2f"|format(account.opening_balance or 0) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reconciliation -->
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Last Reconciliation</h3>
+            {% if account.last_reconciliation_date %}
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Date</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ account.last_reconciliation_date }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Balance</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ "%.2f"|format(account.last_reconciliation_balance or 0) }}</p>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-gray-500 dark:text-gray-400">No reconciliation recorded.</p>
+            {% endif %}
+            <div class="mt-4">
+                <a href="{{ url_for('banking.reconciliation') }}" class="font-medium text-primary-600 dark:text-primary-500 hover:underline">
+                    Start Reconciliation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

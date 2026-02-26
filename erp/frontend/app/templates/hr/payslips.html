@@ -1,0 +1,57 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Payslips</h1>
+        <p class="text-gray-500 dark:text-gray-400">View payslip history</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th class="px-6 py-3">Payslip #</th>
+                        <th class="px-6 py-3">Employee</th>
+                        <th class="px-6 py-3">Pay Period</th>
+                        <th class="px-6 py-3">Gross</th>
+                        <th class="px-6 py-3">Deductions</th>
+                        <th class="px-6 py-3">Net Pay</th>
+                        <th class="px-6 py-3">Status</th>
+                        <th class="px-6 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payslip in payslips %}
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ payslip.payslip_number }}</td>
+                        <td class="px-6 py-4">{{ payslip.employee_name or 'N/A' }}</td>
+                        <td class="px-6 py-4">{{ payslip.pay_period_start }} - {{ payslip.pay_period_end }}</td>
+                        <td class="px-6 py-4">{{ "%.2f"|format(payslip.gross_salary) }}</td>
+                        <td class="px-6 py-4">{{ "%.2f"|format(payslip.total_deductions) }}</td>
+                        <td class="px-6 py-4 font-medium">{{ "%.2f"|format(payslip.net_salary) }}</td>
+                        <td class="px-6 py-4">
+                            {% if payslip.status == 'paid' %}
+                            <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Paid</span>
+                            {% else %}
+                            <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{{ url_for('hr.view_payslip', payslip_id=payslip.id) }}" class="font-medium text-primary-600 dark:text-primary-500 hover:underline">View</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            No payslips found. <a href="{{ url_for('hr.run_payroll') }}" class="text-primary-600 hover:underline">Run payroll</a> to generate payslips.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Balance Sheet</h1>
+            <p class="text-gray-500 dark:text-gray-400">Financial position report</p>
+        </div>
+        <button onclick="window.print()" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+            Print
+        </button>
+    </div>
+
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6 mb-6">
+        <div class="flex items-center gap-4">
+            <div>
+                <label for="as_of_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">As of Date</label>
+                <input type="date" id="as_of_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div class="flex items-end">
+                <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Generate
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Assets -->
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Assets</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b dark:border-gray-700">
+                    <span class="text-gray-600 dark:text-gray-400">Cash and Bank</span>
+                    <span class="font-medium text-gray-900 dark:text-white">0.00</span>
+                </div>
+                <div class="flex justify-between py-2 border-b dark:border-gray-700">
+                    <span class="text-gray-600 dark:text-gray-400">Accounts Receivable</span>
+                    <span class="font-medium text-gray-900 dark:text-white">0.00</span>
+                </div>
+                <div class="flex justify-between py-2 border-b dark:border-gray-700">
+                    <span class="text-gray-600 dark:text-gray-400">Inventory</span>
+                    <span class="font-medium text-gray-900 dark:text-white">0.00</span>
+                </div>
+                <div class="flex justify-between py-2 border-b dark:border-gray-700">
+                    <span class="text-gray-600 dark:text-gray-400">Fixed Assets</span>
+                    <span class="font-medium text-gray-900 dark:text-white">0.00</span>
+                </div>
+                <div class="flex justify-between py-3 bg-blue-50 dark:bg-blue-900/20 rounded px-2 font-bold">
+                    <span class="text-blue-800 dark:text-blue-300">Total Assets</span>
+                    <span class="text-blue-800 dark:text-blue-300">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liabilities & Equity -->
+        <div class="space-y-6">
+            <!-- Liabilities -->
+            <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Liabilities</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between py-2 border-b dark:border-gray-700">
+                        <span class="text-gray-600 dark:text-gray-400">Accounts Payable</span>
+                        <span class="font-medium text-gray-900 dark:text-white">0.00</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b dark:border-gray-700">
+                        <span class="text-gray-600 dark:text-gray-400">Other Liabilities</span>
+                        <span class="font-medium text-gray-900 dark:text-white">0.00</span>
+                    </div>
+                    <div class="flex justify-between py-3 bg-red-50 dark:bg-red-900/20 rounded px-2 font-bold">
+                        <span class="text-red-800 dark:text-red-300">Total Liabilities</span>
+                        <span class="text-red-800 dark:text-red-300">0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equity -->
+            <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Equity</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between py-2 border-b dark:border-gray-700">
+                        <span class="text-gray-600 dark:text-gray-400">Owner's Equity</span>
+                        <span class="font-medium text-gray-900 dark:text-white">0.00</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b dark:border-gray-700">
+                        <span class="text-gray-600 dark:text-gray-400">Retained Earnings</span>
+                        <span class="font-medium text-gray-900 dark:text-white">0.00</span>
+                    </div>
+                    <div class="flex justify-between py-3 bg-purple-50 dark:bg-purple-900/20 rounded px-2 font-bold">
+                        <span class="text-purple-800 dark:text-purple-300">Total Equity</span>
+                        <span class="text-purple-800 dark:text-purple-300">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

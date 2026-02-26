@@ -1,0 +1,81 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Purchase Bills</h1>
+            <p class="text-gray-500 dark:text-gray-400">Manage your purchase bills from vendors</p>
+        </div>
+        <a href="{{ url_for('purchases.new_bill') }}" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+            New Bill
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-4 mb-6">
+        <form method="GET" class="flex gap-4">
+            <select name="status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <option value="">All Status</option>
+                <option value="draft" {% if request.args.get('status') == 'draft' %}selected{% endif %}>Draft</option>
+                <option value="pending" {% if request.args.get('status') == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="partial" {% if request.args.get('status') == 'partial' %}selected{% endif %}>Partial</option>
+                <option value="paid" {% if request.args.get('status') == 'paid' %}selected{% endif %}>Paid</option>
+            </select>
+            <button type="submit" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                Filter
+            </button>
+        </form>
+    </div>
+
+    <!-- Bills Table -->
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th class="px-6 py-3">Bill Number</th>
+                        <th class="px-6 py-3">Vendor</th>
+                        <th class="px-6 py-3">Date</th>
+                        <th class="px-6 py-3">Due Date</th>
+                        <th class="px-6 py-3">Total</th>
+                        <th class="px-6 py-3">Status</th>
+                        <th class="px-6 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bill in bills %}
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                            <a href="{{ url_for('purchases.view_bill', bill_id=bill.id) }}" class="text-primary-600 hover:underline">
+                                {{ bill.bill_number }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4">{{ bill.vendor_name or 'N/A' }}</td>
+                        <td class="px-6 py-4">{{ bill.bill_date }}</td>
+                        <td class="px-6 py-4">{{ bill.due_date or '-' }}</td>
+                        <td class="px-6 py-4">{{ "%.2f"|format(bill.total_amount) }}</td>
+                        <td class="px-6 py-4">
+                            {% set status_colors = {'draft': 'gray', 'pending': 'yellow', 'partial': 'blue', 'paid': 'green'} %}
+                            {% set color = status_colors.get(bill.status, 'gray') %}
+                            <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-{{ color }}-100 text-{{ color }}-800 dark:bg-{{ color }}-900 dark:text-{{ color }}-300">
+                                {{ bill.status|title }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{{ url_for('purchases.view_bill', bill_id=bill.id) }}" class="font-medium text-primary-600 dark:text-primary-500 hover:underline">View</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            No purchase bills found. <a href="{{ url_for('purchases.new_bill') }}" class="text-primary-600 hover:underline">Create one</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

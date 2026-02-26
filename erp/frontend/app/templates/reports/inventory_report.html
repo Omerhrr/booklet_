@@ -1,0 +1,61 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Inventory Report</h1>
+            <p class="text-gray-500 dark:text-gray-400">Stock levels and valuation</p>
+        </div>
+        <button onclick="window.print()" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+            Print
+        </button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Total Products</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ report.total_products | default(0) }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Low Stock Items</p>
+            <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ report.low_stock | default(0) }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Out of Stock</p>
+            <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ report.out_of_stock | default(0) }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Inventory Value</p>
+            <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ report.inventory_value | default('0.00') }}</p>
+        </div>
+    </div>
+
+    <!-- Stock List -->
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Stock Levels</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th class="px-6 py-3">Product</th>
+                        <th class="px-6 py-3">SKU</th>
+                        <th class="px-6 py-3">Stock Qty</th>
+                        <th class="px-6 py-3">Reorder Level</th>
+                        <th class="px-6 py-3">Value</th>
+                        <th class="px-6 py-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            No inventory data available.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

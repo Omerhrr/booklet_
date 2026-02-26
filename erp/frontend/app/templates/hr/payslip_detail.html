@@ -1,0 +1,104 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Payslip {{ payslip.payslip_number }}</h1>
+            <p class="text-gray-500 dark:text-gray-400">{{ payslip.pay_period_start }} - {{ payslip.pay_period_end }}</p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="window.print()" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                Print
+            </button>
+            <a href="{{ url_for('hr.payslips') }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <!-- Header -->
+            <div class="text-center mb-8 pb-6 border-b dark:border-gray-700">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">PAYSLIP</h2>
+                <p class="text-gray-500 dark:text-gray-400">{{ payslip.payslip_number }}</p>
+            </div>
+
+            <!-- Employee Info -->
+            <div class="grid grid-cols-2 gap-6 mb-8">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Employee</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ payslip.employee_name or 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Pay Period</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ payslip.pay_period_start }} - {{ payslip.pay_period_end }}</p>
+                </div>
+            </div>
+
+            <!-- Earnings -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Earnings</h3>
+                <table class="w-full text-sm">
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2 text-gray-500 dark:text-gray-400">Basic Salary</td>
+                        <td class="py-2 text-right font-medium text-gray-900 dark:text-white">{{ "%.2f"|format(payslip.basic_salary) }}</td>
+                    </tr>
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2 text-gray-500 dark:text-gray-400">Allowances</td>
+                        <td class="py-2 text-right font-medium text-gray-900 dark:text-white">{{ "%.2f"|format(payslip.allowances) }}</td>
+                    </tr>
+                    <tr class="bg-gray-50 dark:bg-gray-700">
+                        <td class="py-2 font-medium text-gray-900 dark:text-white">Gross Salary</td>
+                        <td class="py-2 text-right font-bold text-gray-900 dark:text-white">{{ "%.2f"|format(payslip.gross_salary) }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Deductions -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Deductions</h3>
+                <table class="w-full text-sm">
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2 text-gray-500 dark:text-gray-400">PAYE</td>
+                        <td class="py-2 text-right font-medium text-red-600">-{{ "%.2f"|format(payslip.paye) }}</td>
+                    </tr>
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2 text-gray-500 dark:text-gray-400">Pension (Employee)</td>
+                        <td class="py-2 text-right font-medium text-red-600">-{{ "%.2f"|format(payslip.pension_employee) }}</td>
+                    </tr>
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2 text-gray-500 dark:text-gray-400">Other Deductions</td>
+                        <td class="py-2 text-right font-medium text-red-600">-{{ "%.2f"|format(payslip.other_deductions) }}</td>
+                    </tr>
+                    <tr class="bg-gray-50 dark:bg-gray-700">
+                        <td class="py-2 font-medium text-gray-900 dark:text-white">Total Deductions</td>
+                        <td class="py-2 text-right font-bold text-red-600">-{{ "%.2f"|format(payslip.total_deductions) }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Net Pay -->
+            <div class="border-t dark:border-gray-700 pt-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-gray-900 dark:text-white">Net Pay</span>
+                    <span class="text-2xl font-bold text-green-600">{{ "%.2f"|format(payslip.net_salary) }}</span>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="mt-6 pt-6 border-t dark:border-gray-700">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 dark:text-gray-400">Status</span>
+                    {% if payslip.status == 'paid' %}
+                    <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Paid on {{ payslip.paid_date }}</span>
+                    {% else %}
+                    <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Pending</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Trial Balance</h1>
+            <p class="text-gray-500 dark:text-gray-400">Verify debits equal credits</p>
+        </div>
+        <button onclick="window.print()" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+            Print
+        </button>
+    </div>
+
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6 mb-6">
+        <div class="flex items-center gap-4">
+            <div>
+                <label for="as_of_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">As of Date</label>
+                <input type="date" id="as_of_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div class="flex items-end">
+                <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Generate
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th class="px-6 py-3">Account Code</th>
+                        <th class="px-6 py-3">Account Name</th>
+                        <th class="px-6 py-3 text-right">Debit</th>
+                        <th class="px-6 py-3 text-right">Credit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            Select a date and generate to view trial balance.
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th class="px-6 py-3" colspan="2">Total</th>
+                        <th class="px-6 py-3 text-right">0.00</th>
+                        <th class="px-6 py-3 text-right">0.00</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

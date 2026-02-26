@@ -1,0 +1,69 @@
+{% extends "dashboard_layout.html" %}
+
+{% block page_title %}{{ 'Edit Customer' if customer else 'New Customer' }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ 'Edit Customer' if customer else 'Add New Customer' }}</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ 'Update customer information' if customer else 'Create a new customer record' }}</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('crm.edit_customer', customer_id=customer.id) if customer else url_for('crm.new_customer') }}" class="p-6 space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            {% if error %}
+            <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800" role="alert">
+                {{ error }}
+            </div>
+            {% endif %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Customer Name *</label>
+                    <input type="text" name="name" id="name" required value="{{ customer.name if customer else '' }}" 
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                    <input type="email" name="email" id="email" value="{{ customer.email if customer else '' }}" 
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone</label>
+                    <input type="text" name="phone" id="phone" value="{{ customer.phone if customer else '' }}" 
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
+                    <textarea name="address" id="address" rows="3" 
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500">{{ customer.address if customer else '' }}</textarea>
+                </div>
+                
+                <div>
+                    <label for="tax_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tax ID</label>
+                    <input type="text" name="tax_id" id="tax_id" value="{{ customer.tax_id if customer else '' }}" 
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                
+                <div>
+                    <label for="credit_limit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Credit Limit</label>
+                    <input type="number" name="credit_limit" id="credit_limit" step="0.01" value="{{ customer.credit_limit if customer else '0' }}" 
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <a href="{{ url_for('crm.list_customers') }}" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium">Cancel</a>
+                <button type="submit" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition">
+                    {{ 'Update Customer' if customer else 'Add Customer' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Expenses Report</h1>
+            <p class="text-gray-500 dark:text-gray-400">Track and analyze business expenses</p>
+        </div>
+        <button onclick="window.print()" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+            Print
+        </button>
+    </div>
+
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6 mb-6">
+        <div class="flex items-center gap-4">
+            <div>
+                <label for="start_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Date</label>
+                <input type="date" name="start_date" id="start_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label for="end_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">End Date</label>
+                <input type="date" name="end_date" id="end_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div class="flex items-end">
+                <button class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Generate
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Total Expenses</p>
+            <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ report.total_expenses | default('0.00') }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Expense Count</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ report.expense_count | default(0) }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Avg per Expense</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ report.avg_expense | default('0.00') }}</p>
+        </div>
+    </div>
+
+    <!-- By Category -->
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Expenses by Category</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th class="px-6 py-3">Category</th>
+                        <th class="px-6 py-3">Amount</th>
+                        <th class="px-6 py-3">Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            Select date range and generate to view report.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

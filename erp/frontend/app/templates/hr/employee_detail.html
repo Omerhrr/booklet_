@@ -1,0 +1,107 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ employee.full_name }}</h1>
+            <p class="text-gray-500 dark:text-gray-400">{{ employee.position or 'Employee' }} - {{ employee.department or 'No Department' }}</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ url_for('hr.edit_employee', employee_id=employee.id) }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                Edit
+            </a>
+            <a href="{{ url_for('hr.list_employees') }}" class="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Personal Information -->
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Personal Information</h3>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Full Name</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.full_name }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.email }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Phone Number</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.phone_number or '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Address</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.address or '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                    {% if employee.is_active %}
+                    <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Active</span>
+                    {% else %}
+                    <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Employment Information -->
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Employment Information</h3>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Department</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.department or '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Position</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.position or '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Hire Date</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.hire_date }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Termination Date</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.termination_date or '-' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payroll Information -->
+        <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Payroll Information</h3>
+            {% if employee.payroll_config %}
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Gross Salary</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ "%.2f"|format(employee.payroll_config.gross_salary) }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Pay Frequency</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.payroll_config.pay_frequency }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">PAYE Rate</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.payroll_config.paye_rate or 0 }}%</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Pension (Employee)</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.payroll_config.pension_employee_rate or 0 }}%</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Pension (Employer)</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ employee.payroll_config.pension_employer_rate or 0 }}%</p>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-gray-500 dark:text-gray-400">No payroll configuration set up.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
