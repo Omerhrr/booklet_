@@ -17,7 +17,9 @@ app.config['BACKEND_URL'] = os.getenv('BACKEND_URL', 'http://localhost:8000')
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# CSRF Protection
+# CSRF Protection - Configure for HTMX
+app.config['WTF_CSRF_HEADERS'] = ['X-CSRFToken', 'X-CSRF-Token']
+app.config['WTF_CSRF_TIME_LIMIT'] = None  # No time limit for CSRF tokens
 csrf = CSRFProtect(app)
 
 
@@ -67,6 +69,36 @@ def login_required(f):
     return decorated_function
 
 
+def permission_required(*permissions):
+    """Decorator to require specific permissions.
+    User must have at least one of the specified permissions.
+    Superusers bypass this check.
+    """
+    def decorator(f):
+        @wraps(f)
+        @login_required
+        def decorated_function(*args, **kwargs):
+            # Superusers have all permissions
+            if session.get('is_superuser', False):
+                return f(*args, **kwargs)
+            
+            # Check if user has any of the required permissions
+            user_permissions = session.get('permissions', [])
+            if not user_permissions:
+                user_permissions = []
+            
+            # Check if user has at least one required permission
+            has_access = any(perm in user_permissions for perm in permissions)
+            
+            if not has_access:
+                from flask import abort
+                abort(403)
+            
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
 def get_current_user():
     """Get current user from session/API"""
     if 'access_token' not in session:
@@ -89,7 +121,9 @@ def inject_globals():
     return {
         'current_user': get_current_user(),
         'app_name': 'Booklet ERP',
-        'current_year': __import__('datetime').datetime.now().year
+        'current_year': __import__('datetime').datetime.now().year,
+        'has_permission': lambda perm: perm in session.get('permissions', []) or session.get('is_superuser', False),
+        'debug_permissions': lambda: session.get('permissions', [])
     }
 
 
