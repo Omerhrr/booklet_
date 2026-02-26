@@ -37,6 +37,58 @@ class UserService:
             .filter(User.business_id == business_id)\
             .all()
     
+    def get_user_with_roles_and_permissions(self, user_id: int) -> Optional[dict]:
+        """Get user with their roles and permissions"""
+        user = self.db.query(User)\
+            .options(
+                joinedload(User.roles).joinedload(UserBranchRole.branch),
+                joinedload(User.roles).joinedload(UserBranchRole.role)
+            )\
+            .filter(User.id == user_id)\
+            .first()
+        
+        if not user:
+            return None
+        
+        # Get all permissions through roles
+        permissions = set()
+        role_info = []
+        
+        for user_role in user.roles:
+            role = user_role.role
+            branch = user_role.branch
+            
+            if role:
+                role_info.append({
+                    'role_id': role.id,
+                    'role_name': role.name,
+                    'role_description': role.description,
+                    'branch_id': branch.id if branch else None,
+                    'branch_name': branch.name if branch else None
+                })
+                
+                # Get permissions for this role
+                role_perms = self.db.query(RolePermission).filter(
+                    RolePermission.role_id == role.id
+                ).all()
+                
+                for rp in role_perms:
+                    perm = self.db.query(Permission).filter(Permission.id == rp.permission_id).first()
+                    if perm:
+                        permissions.add(perm.name)
+        
+        return {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'is_superuser': user.is_superuser,
+            'is_active': user.is_active,
+            'business_id': user.business_id,
+            'created_at': user.created_at,
+            'roles': role_info,
+            'permissions': list(permissions)
+        }
+    
     def create(self, user_data, business_id: int, is_superuser: bool = False) -> User:
         # Handle both dict and UserCreate schema
         if isinstance(user_data, dict):

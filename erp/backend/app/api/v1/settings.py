@@ -209,6 +209,22 @@ async def list_users(
     return user_service.get_users_by_business(current_user.business_id)
 
 
+@router.get("/users/{user_id}")
+async def get_user_details(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    """Get user details with roles and permissions"""
+    user_service = UserService(db)
+    user = user_service.get_user_with_roles_and_permissions(user_id)
+    
+    if not user or user['business_id'] != current_user.business_id:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return user
+
+
 @router.post("/users", response_model=UserResponse, dependencies=[Depends(PermissionChecker(["users:create"]))])
 async def create_user(
     user_data: UserCreate,
